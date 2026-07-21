@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  infernet-node:
+    image: ritualnetwork/infernet-node:1.2.0
+    container_name: safescan-infernet-node
+    environment:
+      - RPC_URL=${RPC_URL}
+      - PRIVATE_KEY=${PRIVATE_KEY}
+    volumes:
+      - ./config.json:/app/config.json
+    ports:
+      - "4000:4000"
+    restart: on-failure
+
+  safescan-ai:
+    build: .
+    container_name: safescan-ai-auditor
+    ports:
+      - "3000:3000"
+    restart: on-failure
