@@ -100,6 +100,10 @@
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span class="hidden md:block font-mono tracking-wide">SETTINGS</span>
                 </button>
+                <button data-page="page-quests" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded border border-transparent transition-all">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="hidden md:block font-mono tracking-wide text-blue-400 font-bold" style="text-shadow: 0 0 5px rgba(59,130,246,0.5)">AIRDROP QUESTS</span>
+                </button>
                 <button data-page="page-about" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded border border-transparent transition-all">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span class="hidden md:block font-mono tracking-wide">ABOUT PROJECT</span>
@@ -655,6 +659,66 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+        </div>
+        
+        <!-- PAGE: QUESTS -->
+        <div id="page-quests" class="page-view flex flex-col h-full w-full absolute inset-0 bg-[#050607] z-0 opacity-0 pointer-events-none transition-opacity duration-300 pb-8">
+            <header class="h-16 border-b border-ritual-border bg-[#0a0c0e] flex items-center px-6 shrink-0 z-10">
+                <h1 class="text-gray-300 font-mono text-sm uppercase tracking-widest">System // Social Quests</h1>
+            </header>
+            <div class="p-8 flex-1 overflow-y-auto terminal-scroll bg-dots">
+                <div class="max-w-4xl mx-auto space-y-8 pb-32">
+                    <div class="bg-[#0a0c0e] border border-blue-500/30 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.1)] overflow-hidden p-8 relative">
+                        <div class="absolute top-0 right-0 px-4 py-1 bg-blue-500/20 text-blue-400 font-mono text-xs border-b border-l border-blue-500/30 rounded-bl-lg">AIRDROP LIVE</div>
+                        <div class="text-blue-400 font-mono font-bold text-3xl tracking-wider uppercase mb-2" style="text-shadow: 0 0 10px rgba(59,130,246,0.5)">Ritual Hackathon Quests</div>
+                        <div class="text-gray-400 font-mono text-sm mb-8">Complete the tasks below to support SafeScan and earn points.</div>
+                        
+                        <div class="space-y-4">
+                            <!-- Task 1 -->
+                            <div class="flex items-center justify-between p-4 border border-gray-800 rounded bg-black hover:border-gray-600 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center border border-gray-700">
+                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-gray-200 font-mono text-sm">Follow @RitualNet on X</div>
+                                        <div class="text-xs text-gray-500 font-mono mt-1">+100 Points</div>
+                                    </div>
+                                </div>
+                                <a href="https://twitter.com/ritualnet" target="_blank" class="px-6 py-2 bg-white text-black font-bold font-mono text-xs rounded hover:bg-gray-200 transition-colors">START</a>
+                            </div>
+
+                            <!-- Task 2 -->
+                            <div class="flex items-center justify-between p-4 border border-gray-800 rounded bg-black hover:border-gray-600 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center border border-gray-700">
+                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-gray-200 font-mono text-sm">Like & Repost our Submission</div>
+                                        <div class="text-xs text-gray-500 font-mono mt-1">+150 Points</div>
+                                    </div>
+                                </div>
+                                <a href="https://twitter.com/intent/tweet?text=Check%20out%20SafeScan%20for%20the%20@RitualNet%20Hackathon!%20%23RitualHackathon" target="_blank" class="px-6 py-2 bg-blue-500 text-white font-bold font-mono text-xs rounded hover:bg-blue-600 transition-colors shadow-[0_0_10px_rgba(59,130,246,0.3)]">SHARE</a>
+                            </div>
+
+                            <!-- Task 3 -->
+                            <div class="flex items-center justify-between p-4 border border-gray-800 rounded bg-black hover:border-gray-600 transition-colors opacity-50 cursor-not-allowed">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center border border-gray-700">
+                                        <svg class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.461-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-gray-200 font-mono text-sm">Join Ritual Discord</div>
+                                        <div class="text-xs text-gray-500 font-mono mt-1">+200 Points</div>
+                                    </div>
+                                </div>
+                                <div class="px-4 py-2 bg-gray-800 text-gray-400 font-bold font-mono text-xs rounded">COMING SOON</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
