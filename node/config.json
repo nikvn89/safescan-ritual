@@ -1,0 +1,26 @@
+{
+  "log_path": "infernet_node.log",
+  "server": {
+    "port": 4000
+  },
+  "chain": {
+    "enabled": true,
+    "rpc_url": "ENV:RPC_URL",
+    "coordinator_address": "0x8D871Ef2826ac9001fB2e33fDD6379b6aaBF449c",
+    "wallet": {
+      "private_key": "ENV:PRIVATE_KEY"
+    }
+  },
+  "docker": {
+    "username": "ritualnet",
+    "password": ""
+  },
+  "containers": [
+    {
+      "id": "safescan-ai-auditor",
+      "image": "safescan-ai:latest",
+      "external": true,
+      "port": 3000
+    }
+  ]
+}

@@ -1,46 +1,59 @@
-# SafeScan (Powered by Ritual Coprocessor)
+# SafeScan: AI Smart Contract Auditor (Ritual Hackathon)
 
-SafeScan is an advanced, automated smart contract auditing platform designed to democratize Web3 security. It protects retail investors and developers from malicious code, honeypots, and rug pulls by translating complex Solidity code into human-readable security warnings.
+SafeScan is a decentralized, AI-powered smart contract auditing tool built on the **Ritual Infernet Coprocessor**. It allows retail users to instantly scan any EVM smart contract for critical vulnerabilities like Reentrancy, Honeypots (99% sell tax), and Unlimited Minting privileges before interacting with them.
 
-Built for the **Ritual Hackathon**, this project leverages the concept of Decentralized AI (Infernet/Coprocessor) to provide real-time, on-chain vulnerability scanning.
+## 🌟 Why SafeScan?
+Retail investors lose millions to malicious smart contracts every day. Running deep static analysis and heuristic checks on-chain is computationally expensive and infeasible. 
+SafeScan solves this by offloading the heavy analysis to **Ritual's off-chain Infernet Coprocessor**, which fetches the verified source code, runs heuristic checks, and pushes a Trust Score back on-chain.
 
-## 🚀 Features
+## 🏗️ Architecture
+- **Frontend**: A sleek, terminal-like web interface for users to enter contract addresses.
+- **Smart Contract (`SafeScanCoproc.sol`)**: A `CallbackConsumer` that requests an AI audit from the Ritual Coprocessor.
+- **Infernet AI Node (Python)**: An off-chain node that receives the request, fetches the code from block explorers, runs the security analysis, and returns the verdict.
 
-* **Real-time On-Chain Fetching:** Paste any Etherscan or Dexscreener link. SafeScan will automatically extract the contract address and fetch the verified source code directly from block explorers.
-* **Static Analysis Engine:** Rapidly scans verified source code for known vulnerabilities.
-* **Honeypot & Tax Detection:** Identifies hidden transfer restrictions and malicious tax logic.
-* **Terminal Interface:** A sleek, hacker-style UI designed for maximum impact during hackathon presentations.
-* **Ritual Coprocessor Integration:** Utilizes an off-chain Python node to perform heavy ML/heuristic analysis, returning the audit score back to the on-chain smart contract.
+## 🚀 Getting Started (For Judges & Developers)
 
-## 🏗 System Architecture
+To build and run this project locally, you will need to set up the Infernet Node and deploy the smart contracts. **You must use the Ritual Testnet and acquire faucet tokens.**
 
-This repository contains the full stack required for the SafeScan ecosystem:
+### Prerequisites
+1. Docker & Docker Compose
+2. [Foundry](https://getfoundry.sh/) (Forge)
+3. A newly created EVM wallet (Do NOT use your main wallet, as you will need the private key).
 
-1. **Frontend (`index.html`, `app.js`):** A static web application that serves as the user-facing terminal.
-2. **On-Chain Contract (`contracts/RitualAuditor.sol`):** The Smart Contract that requests audits and stores the resulting security scores on-chain. Built for Hardhat.
-3. **Off-Chain Node (`node/audit_service.py`):** The Python Coprocessor service that listens for on-chain audit requests, performs the analysis, and submits the results back to the blockchain.
+### 1. Setup Wallet & Faucet
+1. Join the [Ritual Discord](https://discord.gg/ritual).
+2. Create a fresh wallet and copy its address.
+3. Use the Faucet in Discord to request testnet `$RITUAL` tokens for your new wallet.
 
-## 🛠 Tech Stack
+### 2. Configure the Node
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/nikvn89/safescan-ritual.git
+   cd safescan-ritual
+   ```
+2. Copy the `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+3. Open `.env` and enter your newly created wallet's `PRIVATE_KEY`.
 
-* **Frontend:** HTML5, Vanilla JavaScript, TailwindCSS
-* **Smart Contracts:** Solidity, Hardhat, Ethers.js
-* **Backend Node:** Python 3, Web3.py
-* **Blockchain APIs:** Etherscan, BscScan, Arbiscan, BaseScan
+### 3. Run the Infernet Node
+Start the off-chain Ritual Coprocessor node and the SafeScan AI Python container using the provided Makefile:
+```bash
+make node-up
+```
+*(To stop the node later, run `make node-down`)*
 
-## 📦 How to Run Locally
+### 4. Deploy the Smart Contract
+Deploy the `SafeScanCoproc` contract to the Ritual Testnet:
+```bash
+make deploy
+```
+This will compile the contracts and broadcast the transaction using your funded testnet wallet.
 
-### 1. Frontend UI
-* Open `index.html` in any modern web browser.
-* No build steps or `npm install` required! It runs completely client-side.
+## 🎨 Try the Frontend Demo
+You can try the frontend UI (which runs in mock mode for faster UX demonstration) here:
+👉 **[Live Demo](https://safescan-ritual.vercel.app/)**
 
-### 2. Smart Contract (Hardhat)
-* Run `npm install` to install Hardhat and dependencies.
-* Run `npx hardhat compile` to build the `RitualAuditor.sol` contract.
-
-### 3. Coprocessor Node
-* Navigate to the `node/` directory.
-* Run `pip install web3` (requires Python 3.8+).
-* Run `python audit_service.py` to start listening for events.
-
-## 🤝 Contributing
-This is a hackathon project built for the **Ritual Hackathon**. Feel free to fork and expand upon the scanning logic (e.g., integrating an actual LLM backend via Ritual Infernet SDK).
+## 📜 License
+MIT License
