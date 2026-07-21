@@ -171,7 +171,28 @@ contract FiatTokenV2 {
         balances[to] += amount;
         return true;
     }
-}
+}`,
+    "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000": `// [Fake Token - Minting Scam]
+contract FakeLuna {
+    string public name = "Luna Classic 2.0";
+    string public symbol = "LUNC2";
+    address public owner;
+    mapping(address => uint256) balances;
+
+    constructor() { owner = msg.sender; }
+
+    // CRITICAL VULNERABILITY: Unlimited Minting
+    // Owner can print infinite tokens at will and dump them.
+    function mint(uint256 amount) public {
+        require(msg.sender == owner, "Only owner can mint");
+        balances[owner] += amount;
+    }
+
+    function transfer(address to, uint256 amount) public {
+        balances[msg.sender] -= amount;
+        balances[to] += amount;
+    }
+}`
 };
 
 // UI Elements
