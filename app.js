@@ -483,7 +483,7 @@ auditBtn.addEventListener('click', async () => {
     let contractName = "target_contract";
 
     // 1. Check Mock Data Cache first
-    if (MOCK_DATA[address] && !apiKey) {
+    if (MOCK_DATA[address]) {
         await new Promise(r => setTimeout(r, 1200)); 
         source = MOCK_DATA[address];
         if (address === "0x6982508145454ce325ddbe47a25d4ec3d2311933") contractName = "PepeToken";
