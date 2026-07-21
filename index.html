@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeScan - Enterprise Blockchain Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/solidity.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ritual: {
+                            black: '#050505',
+                            dark: '#0e0e0e',
+                            panel: '#111315',
+                            green: '#00ff41',
+                            red: '#ff2a2a',
+                            border: '#22262a',
+                            text: '#a0a0a0'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['"Fira Code"', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'marquee': 'marquee 25s linear infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'radar': 'spin 4s linear infinite',
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #e5e5e5; }
+        .terminal-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        .terminal-scroll::-webkit-scrollbar-thumb:hover { background: #00ff41; }
+        
+        .glow-green { text-shadow: 0 0 10px rgba(0, 255, 65, 0.6); }
+        .glow-red { text-shadow: 0 0 10px rgba(255, 42, 42, 0.6); }
+        .tab-active { border-bottom: 2px solid #00ff41; color: #00ff41; background: rgba(0,255,65,0.05); }
+        
+        .ticker-wrap { overflow: hidden; white-space: nowrap; box-sizing: border-box; }
+        
+        /* Custom Radar Sweep */
+        .radar-sweep {
+            background: conic-gradient(from 0deg, transparent 70%, rgba(0,255,65,0.1) 90%, rgba(0,255,65,0.6) 100%);
+        }
+        
+        /* Threat Map Dots Background */
+        .bg-dots {
+            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="h-screen flex font-sans overflow-hidden text-sm">
+
+    <!-- Sidebar -->
+    <aside class="w-16 md:w-64 bg-[#0a0c0e] border-r border-ritual-border flex flex-col justify-between transition-all duration-300 z-50 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
+        <div>
+            <!-- Logo -->
+            <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-ritual-border cursor-pointer bg-gradient-to-r from-black to-[#0a0c0e]" onclick="location.reload()">
+                <div class="text-ritual-green font-mono font-bold text-xl glow-green tracking-wider hidden md:block uppercase">
+                    Safe<span class="text-white">Scan</span>
+                </div>
+                <div class="text-ritual-green font-mono font-bold text-xl md:hidden">R</div>
+            </div>
+            
+            <!-- Nav Links -->
+            <nav class="mt-6 flex flex-col gap-2 px-3" id="sidebar-nav">
+                <button data-page="page-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 bg-ritual-green/10 text-ritual-green rounded border border-ritual-green/20 transition-all shadow-[0_0_10px_rgba(0,255,65,0.1)]">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    <span class="hidden md:block font-mono font-medium tracking-wide">DASHBOARD</span>
+                </button>
+                <button data-page="page-audits" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded border border-transparent transition-all">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <span class="hidden md:block font-mono tracking-wide">LIVE AUDITS</span>
+                </button>
+                <button data-page="page-intel" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded border border-transparent transition-all">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span class="hidden md:block font-mono tracking-wide">THREAT INTEL</span>
+                </button>
+                <button data-page="page-settings" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded border border-transparent transition-all">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="hidden md:block font-mono tracking-wide">SETTINGS</span>
+                </button>
+                <button data-page="page-about" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded border border-transparent transition-all">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="hidden md:block font-mono tracking-wide">ABOUT PROJECT</span>
+                </button>
+            </nav>
+        </div>
+        
+        <div class="p-4 border-t border-ritual-border text-center bg-[#050607]">
+            <div class="w-2 h-2 bg-ritual-green rounded-full mx-auto md:mx-0 md:inline-block animate-pulse shadow-[0_0_8px_lime]"></div>
+            <span class="hidden md:inline-block ml-2 font-mono text-[10px] uppercase tracking-wider text-gray-500">INFERNET ONLINE</span>
+        </div>
+    </aside>
+
+    <!-- Main Views Area -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-ritual-black relative">
+        
+        <!-- PAGE: DASHBOARD -->
+        <div id="page-dashboard" class="page-view flex flex-col h-full w-full absolute inset-0 bg-ritual-black z-10 transition-opacity duration-300">
+            <!-- Header (Inputs) -->
+            <header class="h-16 border-b border-ritual-border bg-gradient-to-r from-ritual-dark to-ritual-black flex items-center justify-between px-6 shrink-0 z-20">
+                <div class="flex items-center gap-4 hidden lg:flex">
+                    <div class="w-8 h-8 rounded bg-ritual-green/10 border border-ritual-green/30 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-ritual-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                    </div>
+                    <h1 class="text-gray-300 font-mono text-sm tracking-widest uppercase">SYSTEM // RITUAL COPROCESSOR</h1>
+                </div>
+                
+                <div class="flex items-center gap-3 w-full lg:w-auto">
+                    <select id="network-select" class="bg-[#111] border border-gray-800 text-gray-300 rounded px-3 py-2 font-mono text-xs outline-none hover:border-gray-600 transition-colors">
+                        <option value="eth">Ethereum</option>
+                        <option value="bsc">BNB Chain</option>
+                        <option value="base">Base</option>
+                        <option value="arb">Arbitrum</option>
+                    </select>
+                    
+                    <input type="password" id="api-key" class="w-32 bg-[#111] border border-gray-800 text-gray-300 rounded px-3 py-2 font-mono text-xs outline-none placeholder-gray-600 focus:border-ritual-green transition-colors" placeholder="API Key" autocomplete="off">
+                    
+                    <div class="relative flex-1 lg:w-96">
+                        <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="contract-address" class="w-full bg-[#111] border border-gray-800 text-white rounded pl-9 pr-3 py-2 font-mono text-xs outline-none placeholder-gray-700 focus:border-ritual-green focus:shadow-[0_0_10px_rgba(0,255,65,0.1)] transition-all" placeholder="Enter Smart Contract Address..." autocomplete="off" value="">
+                    </div>
+                    
+                    <button id="audit-btn" class="bg-ritual-green text-black font-bold font-mono text-xs py-2 px-6 rounded hover:bg-white transition-all shadow-[0_0_15px_rgba(0,255,65,0.3)] hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]">
+                        AUDIT
+                    </button>
+                    
+                    <div class="h-6 w-px bg-gray-700 mx-2"></div>
+                    
+                    <button id="connect-wallet-btn" onclick="connectWallet(this)" class="bg-[#111] border border-gray-700 text-gray-300 font-mono text-[10px] py-2 px-4 rounded hover:bg-[#1a1c1e] hover:border-gray-500 transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        CONNECT WALLET
+                    </button>
+                </div>
+            </header>
+
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 shrink-0 bg-ritual-black z-10 border-b border-ritual-border">
+                <div class="bg-gradient-to-b from-[#111315] to-[#0a0c0e] border border-ritual-border rounded p-4 relative overflow-hidden group hover:border-gray-700 transition-colors">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+                    <div class="text-gray-500 font-mono text-[10px] mb-2 uppercase tracking-wider flex items-center justify-between">
+                        Contracts Scanned (24h)
+                        <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <div class="text-2xl font-mono text-white flex items-baseline gap-2">
+                        <span id="metric-scanned">14,239</span>
+                        <span class="text-blue-400 text-[10px] font-sans bg-blue-500/10 px-1.5 py-0.5 rounded">↑ 12%</span>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-b from-[#111315] to-[#0a0c0e] border border-ritual-border rounded p-4 relative overflow-hidden group hover:border-gray-700 transition-colors">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-ritual-red/10 rounded-full blur-2xl group-hover:bg-ritual-red/20 transition-all"></div>
+                    <div class="text-gray-500 font-mono text-[10px] mb-2 uppercase tracking-wider flex items-center justify-between">
+                        Funds Protected
+                        <svg class="w-3 h-3 text-ritual-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <div class="text-2xl font-mono text-white flex items-baseline gap-2">
+                        $<span id="metric-threats">4.2</span>M
+                        <span class="text-ritual-red text-[10px] font-sans bg-red-500/10 px-1.5 py-0.5 rounded animate-pulse">! Alert</span>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-b from-[#111315] to-[#0a0c0e] border border-ritual-border rounded p-4 relative overflow-hidden group hover:border-gray-700 transition-colors">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-ritual-green/10 rounded-full blur-2xl group-hover:bg-ritual-green/20 transition-all"></div>
+                    <div class="text-gray-500 font-mono text-[10px] mb-2 uppercase tracking-wider flex items-center justify-between">
+                        RITUAL SUBNET NODES
+                        <svg class="w-3 h-3 text-ritual-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                    </div>
+                    <div class="text-2xl font-mono text-white flex items-baseline gap-2">
+                        <span class="text-ritual-green glow-green">42</span> <span class="text-[10px] text-ritual-green font-sans bg-ritual-green/10 px-1.5 py-0.5 rounded">Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Workspace (Split View) -->
+            <div class="flex-1 flex overflow-hidden z-10 pb-8">
+                <!-- Left Pane: Source Code Viewer -->
+                <section class="w-1/2 border-r border-ritual-border flex flex-col bg-[#1e2227] relative">
+                    <div class="bg-[#181a1f] px-4 py-2 text-xs font-mono text-gray-400 flex justify-between items-center border-b border-[#111] shadow-md z-10">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                            <span id="code-filename">target_contract.sol</span>
+                        </span>
+                        <span class="px-2 py-0.5 bg-black rounded text-[9px] text-gray-600 uppercase border border-gray-800">Read-only</span>
+                    </div>
+                    
+                    <div class="flex-1 overflow-auto terminal-scroll relative bg-[#1e2227]">
+                        <!-- Loading Overlay -->
+                        <div id="code-loading" class="absolute inset-0 bg-[#1e2227]/90 flex items-center justify-center hidden z-20 backdrop-blur-[2px]">
+                            <div class="text-ritual-green font-mono flex flex-col items-center gap-6">
+                                <div class="relative w-16 h-16">
+                                    <div class="absolute inset-0 border-2 border-ritual-green/20 rounded-full"></div>
+                                    <div class="absolute inset-0 border-t-2 border-ritual-green rounded-full animate-spin"></div>
+                                    <svg class="absolute inset-0 m-auto w-6 h-6 text-ritual-green animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                </div>
+                                <span class="animate-pulse tracking-widest text-[10px] uppercase text-ritual-green/80">Connecting to Ritual Infernet Node...</span>
+                            </div>
+                        </div>
+                        
+                        <pre class="m-0 h-full"><code id="code-content" class="language-solidity h-full p-6 text-[13px] font-mono leading-relaxed bg-[#1e2227] text-gray-300 block">// SafeScan // SMART CONTRACT AUDITOR
+// 
+// Please enter a contract address and
+// click AUDIT to begin security analysis.</code></pre>
+                    </div>
+                </section>
+
+                <!-- Right Pane: Multi-tab Interface -->
+                <section class="w-1/2 flex flex-col bg-[#0a0c0e] relative shadow-inner">
+                    <!-- Tab Header -->
+                    <div class="bg-gradient-to-r from-[#111315] to-[#0a0c0e] flex items-center border-b border-ritual-border px-2 z-10 shadow-md">
+                        <button class="tab-btn tab-active px-5 py-3 font-mono text-[10px] uppercase tracking-widest font-bold transition-all relative overflow-hidden group" data-target="tab-terminal">
+                            <span class="relative z-10">Analysis Console</span>
+                            <div class="absolute inset-0 bg-ritual-green/10 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                        </button>
+                        <button class="tab-btn px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-gray-500 hover:text-gray-200 transition-all relative overflow-hidden group" data-target="tab-radar">
+                            <span class="relative z-10">Risk Radar</span>
+                        </button>
+                        <button class="tab-btn px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-gray-500 hover:text-gray-200 transition-all relative overflow-hidden group" data-target="tab-gas">
+                            <span class="relative z-10">Gas Opt</span>
+                        </button>
+                        <div class="ml-auto px-4 flex items-center gap-2">
+                            <span class="font-mono text-[9px] text-gray-600">Model: Ritual-SafeScan-v2.1</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Content 1: Terminal -->
+                    <div id="tab-terminal" class="tab-pane flex-1 overflow-auto terminal-scroll p-6 font-mono text-[13px] leading-relaxed text-gray-300 bg-[#050607]">
+                        <div class="text-gray-600 mb-4">> System Ready. Waiting for target contract...</div>
+                    </div>
+                    
+                    <!-- Tab Content 2: Risk Radar (ANIMATED) -->
+                    <div id="tab-radar" class="tab-pane hidden flex-1 p-6 flex flex-col items-center justify-center text-center bg-[#050607]">
+                        <div class="relative w-64 h-64 border border-ritual-green/20 rounded-full flex items-center justify-center mb-8 bg-[#0a0c0e] shadow-[inset_0_0_40px_rgba(0,255,65,0.05)]">
+                            <!-- Radar circles -->
+                            <div class="absolute inset-0 border border-ritual-green/10 rounded-full m-8"></div>
+                            <div class="absolute inset-0 border border-ritual-green/5 rounded-full m-16"></div>
+                            <div class="absolute inset-0 border border-ritual-green/5 rounded-full m-24"></div>
+                            <!-- Crosshairs -->
+                            <div class="absolute w-full h-[1px] bg-ritual-green/10"></div>
+                            <div class="absolute h-full w-[1px] bg-ritual-green/10"></div>
+                            <!-- Sweeper -->
+                            <div class="radar-sweep absolute inset-0 rounded-full animate-radar origin-center"></div>
+                            
+                            <!-- Threat Blips -->
+                            <div class="absolute top-[20%] left-[30%] flex flex-col items-center gap-1">
+                                <div class="w-2 h-2 bg-ritual-red rounded-full shadow-[0_0_10px_red] animate-ping-slow"></div>
+                                <span class="text-[8px] font-mono text-ritual-red">Honeypot</span>
+                            </div>
+                            <div class="absolute bottom-[25%] right-[25%] flex flex-col items-center gap-1">
+                                <div class="w-1.5 h-1.5 bg-yellow-500 rounded-full shadow-[0_0_10px_yellow] animate-ping-slow" style="animation-delay: 1.5s"></div>
+                                <span class="text-[8px] font-mono text-yellow-500">Blacklist</span>
+                            </div>
+                            <!-- Center blip -->
+                            <div class="w-1 h-1 bg-ritual-green rounded-full shadow-[0_0_10px_lime]"></div>
+                        </div>
+                        <h3 class="text-white font-mono text-sm mb-2 uppercase tracking-widest">Visual Threat Topology</h3>
+                        <p class="text-gray-500 font-mono text-xs max-w-xs">Scanning EVM bytecode structural patterns to identify hidden vectors.</p>
+                    </div>
+                    
+                    <!-- Tab Content 3: Gas Opt (ANIMATED) -->
+                    <div id="tab-gas" class="tab-pane hidden flex-1 p-8 flex flex-col bg-[#050607]">
+                        <h3 class="text-white font-mono text-sm mb-8 uppercase tracking-widest text-center">AI Bytecode Optimization</h3>
+                        
+                        <div class="w-full max-w-sm mx-auto space-y-8">
+                            <!-- Original -->
+                            <div>
+                                <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-wide">
+                                    <span>Original Execution Cost</span>
+                                    <span class="text-red-400">1,245,000 Gas</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-[#111] rounded overflow-hidden">
+                                    <div class="h-full bg-red-500/80 w-[90%] shadow-[0_0_10px_red]"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Optimized -->
+                            <div>
+                                <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-wide">
+                                    <span>Ritual Model Prediction</span>
+                                    <span class="text-ritual-green glow-green">840,500 Gas</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-[#111] rounded overflow-hidden">
+                                    <div class="h-full bg-ritual-green w-[60%] shadow-[0_0_10px_lime]"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terminal output -->
+                            <div class="mt-6 p-4 bg-ritual-green/5 border border-ritual-green/20 rounded text-ritual-green font-mono text-[10px] leading-relaxed relative">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-ritual-green"></div>
+                                > Analyzing loops and state variables...<br>
+                                > FOUND: Uncached array length in loop (Line 42).<br>
+                                > FOUND: Redundant storage reads (Line 55).<br>
+                                > ACTION: Applying Ritual optimization pass...<br>
+                                > <span class="text-white font-bold">Estimated Savings: ~$14.20 per TX</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- PAGE: LIVE AUDITS (UPGRADED) -->
+        <div id="page-audits" class="page-view flex flex-col h-full w-full absolute inset-0 bg-[#050607] z-0 opacity-0 pointer-events-none transition-opacity duration-300 pb-8">
+            <header class="h-16 border-b border-ritual-border bg-[#0a0c0e] flex items-center px-6 shrink-0 z-10">
+                <h1 class="text-gray-300 font-mono text-sm uppercase tracking-widest">Global Feed // Live Node Network</h1>
+            </header>
+            <div class="p-8 flex-1 overflow-auto terminal-scroll bg-dots">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="font-mono text-lg text-white">Recent Infernet Computations</h2>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 text-[9px] font-mono uppercase bg-ritual-green/10 text-ritual-green border border-ritual-green/20 rounded">Live Update</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg overflow-hidden shadow-xl">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#111315] border-b border-ritual-border text-gray-500 font-mono text-[10px] uppercase tracking-wider">
+                                    <th class="py-4 px-6">Timestamp</th>
+                                    <th class="py-4 px-6">Chain</th>
+                                    <th class="py-4 px-6">Target Address</th>
+                                    <th class="py-4 px-6">Model Score</th>
+                                    <th class="py-4 px-6">Verdict</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-[11px] font-mono text-gray-300">
+                                <tr class="border-b border-ritual-border/50 hover:bg-[#111315] transition-colors group">
+                                    <td class="py-4 px-6 text-gray-500">12 secs ago</td>
+                                    <td class="py-4 px-6"><span class="bg-blue-900/30 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[9px]">ETH</span></td>
+                                    <td class="py-4 px-6 font-bold group-hover:text-white">0x892a0bd2...3b22</td>
+                                    <td class="py-4 px-6"><span class="text-ritual-red font-bold">10/100</span></td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-2 text-ritual-red">
+                                            <div class="w-1.5 h-1.5 bg-ritual-red rounded-full animate-pulse"></div>
+                                            HONEYPOT
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/50 hover:bg-[#111315] transition-colors group">
+                                    <td class="py-4 px-6 text-gray-500">2 mins ago</td>
+                                    <td class="py-4 px-6"><span class="bg-yellow-900/30 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded text-[9px]">BSC</span></td>
+                                    <td class="py-4 px-6 font-bold group-hover:text-white">0x11111111...1111</td>
+                                    <td class="py-4 px-6"><span class="text-ritual-green font-bold glow-green">100/100</span></td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-2 text-ritual-green">
+                                            <div class="w-1.5 h-1.5 bg-ritual-green rounded-full"></div>
+                                            SAFE
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/50 hover:bg-[#111315] transition-colors group">
+                                    <td class="py-4 px-6 text-gray-500">14 mins ago</td>
+                                    <td class="py-4 px-6"><span class="bg-blue-500/10 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded text-[9px]">BASE</span></td>
+                                    <td class="py-4 px-6 font-bold group-hover:text-white">0x69825081...1933</td>
+                                    <td class="py-4 px-6"><span class="text-yellow-500 font-bold">80/100</span></td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-2 text-yellow-500">
+                                            <div class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                                            BLACKLIST RISK
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-[#111315] transition-colors group">
+                                    <td class="py-4 px-6 text-gray-500">1 hr ago</td>
+                                    <td class="py-4 px-6"><span class="bg-purple-900/30 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded text-[9px]">SOL</span></td>
+                                    <td class="py-4 px-6 font-bold group-hover:text-white">TokenkegQfeZ...</td>
+                                    <td class="py-4 px-6"><span class="text-ritual-red font-bold">45/100</span></td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-2 text-ritual-red">
+                                            <div class="w-1.5 h-1.5 bg-ritual-red rounded-full"></div>
+                                            MINT EXPLOIT
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: THREAT INTEL (UPGRADED) -->
+        <div id="page-intel" class="page-view flex flex-col h-full w-full absolute inset-0 bg-[#050607] z-0 opacity-0 pointer-events-none transition-opacity duration-300 pb-8">
+            <header class="h-16 border-b border-ritual-border bg-[#0a0c0e] flex items-center px-6 shrink-0 z-10">
+                <h1 class="text-gray-300 font-mono text-sm uppercase tracking-widest">Database // Global Threat Intelligence</h1>
+            </header>
+            <div class="p-8 flex-1 overflow-y-auto terminal-scroll bg-dots">
+                
+                <div class="flex flex-col items-center w-full max-w-6xl mx-auto pb-32">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mt-4">
+                        <!-- Threat Map Simulation -->
+                        <div class="col-span-1 md:col-span-2 bg-[#0a0c0e] border border-ritual-border rounded-lg p-6 h-96 relative overflow-hidden flex flex-col items-center justify-center shadow-xl">
+                            <div class="absolute inset-0 opacity-20" style="background: radial-gradient(circle at center, #ff2a2a 0%, transparent 60%);"></div>
+                            <svg class="w-32 h-32 text-ritual-red relative z-10 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            <h2 class="font-mono text-xl text-white mt-4 relative z-10 tracking-widest uppercase">Global Honeypot Registry</h2>
+                            <p class="text-gray-400 font-mono text-xs max-w-md text-center mt-2 relative z-10 leading-relaxed">
+                                Ritual ML models have identified and blacklisted <br>
+                                <span class="text-ritual-red font-bold text-lg inline-block mt-1">2,194,032</span><br>
+                                malicious bytecode patterns across EVM chains.
+                            </p>
+                        </div>
+                        
+                        <!-- Stats Column -->
+                        <div class="flex flex-col gap-4 w-full">
+                            <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg p-5 flex-1 flex flex-col justify-center shadow-xl relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 w-16 h-16 bg-ritual-red/5 rounded-bl-full transition-all group-hover:bg-ritual-red/10"></div>
+                                <div class="text-gray-500 text-[10px] uppercase font-mono tracking-wider mb-2 flex justify-between items-center">
+                                    Zero-day Exploits
+                                    <span class="text-ritual-red bg-ritual-red/10 px-1 rounded flex items-center gap-1 text-[8px] border border-ritual-red/20"><svg class="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg> 24%</span>
+                                </div>
+                                <div class="text-3xl text-white font-mono flex items-end">
+                                    1,204
+                                    <div class="flex items-end gap-1 h-6 ml-auto opacity-70 group-hover:opacity-100 transition-opacity">
+                                        <div class="w-1.5 h-[30%] bg-ritual-red/40 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[50%] bg-ritual-red/50 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[40%] bg-ritual-red/70 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[80%] bg-ritual-red/80 rounded-t-sm shadow-[0_0_5px_red]"></div>
+                                        <div class="w-1.5 h-[100%] bg-ritual-red rounded-t-sm shadow-[0_0_8px_red]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg p-5 flex-1 flex flex-col justify-center shadow-xl relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-bl-full transition-all group-hover:bg-blue-500/10"></div>
+                                <div class="text-gray-500 text-[10px] uppercase font-mono tracking-wider mb-2 flex justify-between items-center">
+                                    Phishing Domains
+                                    <span class="text-blue-400 bg-blue-500/10 px-1 rounded flex items-center gap-1 text-[8px] border border-blue-500/20"><svg class="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg> 12%</span>
+                                </div>
+                                <div class="text-3xl text-white font-mono flex items-end">
+                                    84,392
+                                    <div class="flex items-end gap-1 h-6 ml-auto opacity-70 group-hover:opacity-100 transition-opacity">
+                                        <div class="w-1.5 h-[80%] bg-blue-500/40 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[70%] bg-blue-500/50 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[40%] bg-blue-500/70 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[60%] bg-blue-500/80 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[100%] bg-blue-400 rounded-t-sm shadow-[0_0_8px_blue]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg p-5 flex-1 flex flex-col justify-center shadow-xl relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 w-16 h-16 bg-yellow-500/5 rounded-bl-full transition-all group-hover:bg-yellow-500/10"></div>
+                                <div class="text-gray-500 text-[10px] uppercase font-mono tracking-wider mb-2 flex justify-between items-center">
+                                    Active Drainers
+                                    <span class="text-ritual-green bg-ritual-green/10 px-1 rounded flex items-center gap-1 text-[8px] border border-ritual-green/20"><svg class="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> 5%</span>
+                                </div>
+                                <div class="text-3xl text-white font-mono flex items-end">
+                                    312
+                                    <div class="flex items-end gap-1 h-6 ml-auto opacity-70 group-hover:opacity-100 transition-opacity">
+                                        <div class="w-1.5 h-[90%] bg-yellow-500/40 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[60%] bg-yellow-500/50 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[80%] bg-yellow-500/70 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[40%] bg-yellow-500/80 rounded-t-sm"></div>
+                                        <div class="w-1.5 h-[20%] bg-yellow-400 rounded-t-sm shadow-[0_0_8px_yellow]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 flex gap-4 w-full">
+                        <button class="bg-transparent border border-ritual-red/50 text-ritual-red px-8 py-3 font-mono text-xs uppercase tracking-widest hover:bg-ritual-red hover:text-black transition-all rounded shadow-[0_0_15px_rgba(255,42,42,0.1)] hover:shadow-[0_0_25px_rgba(255,42,42,0.4)]">
+                            Download Dataset (CSV)
+                        </button>
+                    </div>
+                    
+                    <!-- Threat Signatures Database -->
+                    <div class="w-full mt-12 bg-[#0a0c0e] border border-ritual-border rounded-lg overflow-hidden shadow-xl">
+                        <div class="bg-[#111315] border-b border-ritual-border px-6 py-4 flex justify-between items-center">
+                            <h3 class="text-white font-mono text-sm uppercase tracking-widest">Known Threat Signatures</h3>
+                            <div class="text-[10px] text-gray-500 font-mono">Syncing with Ritual Infernet...</div>
+                        </div>
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-gray-500 font-mono text-[10px] uppercase tracking-wider border-b border-ritual-border/50">
+                                    <th class="py-3 px-6">Signature ID</th>
+                                    <th class="py-3 px-6">Attack Vector</th>
+                                    <th class="py-3 px-6">Identified Pattern</th>
+                                    <th class="py-3 px-6">Severity</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-[11px] font-mono text-gray-400">
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x992A-4B</td>
+                                    <td class="py-3 px-6 text-white font-bold">Honeypot (Sell Block)</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">require(msg.sender == owner || !isBlacklisted)</span></td>
+                                    <td class="py-3 px-6"><span class="text-ritual-red font-bold">CRITICAL</span></td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x712C-9F</td>
+                                    <td class="py-3 px-6 text-white font-bold">Reentrancy (DAO Variant)</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">.call{value: amount}("") before balances -= amount</span></td>
+                                    <td class="py-3 px-6"><span class="text-ritual-red font-bold">CRITICAL</span></td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x882F-0A</td>
+                                    <td class="py-3 px-6 text-white font-bold">Oracle Manipulation</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">Reliance on spot balance of UniswapV2 pair</span></td>
+                                    <td class="py-3 px-6"><span class="text-ritual-red font-bold">CRITICAL</span></td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x384D-11</td>
+                                    <td class="py-3 px-6 text-white font-bold">Privilege Escalation</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">Missing onlyOwner modifier on mint()</span></td>
+                                    <td class="py-3 px-6"><span class="text-yellow-500 font-bold">HIGH</span></td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x55E9-2C</td>
+                                    <td class="py-3 px-6 text-white font-bold">Delegatecall Injection</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">target.delegatecall(msg.data) to arbitrary address</span></td>
+                                    <td class="py-3 px-6"><span class="text-ritual-red font-bold">CRITICAL</span></td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x2A11-7B</td>
+                                    <td class="py-3 px-6 text-white font-bold">Uninitialized Proxy</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">Missing initialize() lock on UUPS logic contract</span></td>
+                                    <td class="py-3 px-6"><span class="text-yellow-500 font-bold">HIGH</span></td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x119B-E2</td>
+                                    <td class="py-3 px-6 text-white font-bold">Unbounded Gas Loop</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">for(uint i=0; i&lt;users.length; i++)</span></td>
+                                    <td class="py-3 px-6"><span class="text-yellow-500 font-bold">MEDIUM</span></td>
+                                </tr>
+                                <tr class="border-b border-ritual-border/30 hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x4F88-D1</td>
+                                    <td class="py-3 px-6 text-white font-bold">Weak PRNG (Timestamp)</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">block.timestamp % modulus for random generation</span></td>
+                                    <td class="py-3 px-6"><span class="text-yellow-500 font-bold">MEDIUM</span></td>
+                                </tr>
+                                <tr class="hover:bg-[#111315] transition-colors">
+                                    <td class="py-3 px-6 text-blue-400">R-0x9C33-4F</td>
+                                    <td class="py-3 px-6 text-white font-bold">Exposed Selfdestruct</td>
+                                    <td class="py-3 px-6"><span class="bg-[#111] px-2 py-1 rounded text-[9px] border border-gray-800">selfdestruct(msg.sender) without auth checks</span></td>
+                                    <td class="py-3 px-6"><span class="text-ritual-red font-bold">CRITICAL</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: SETTINGS (UPGRADED) -->
+        <div id="page-settings" class="page-view flex flex-col h-full w-full absolute inset-0 bg-[#050607] z-0 opacity-0 pointer-events-none transition-opacity duration-300 pb-8">
+            <header class="h-16 border-b border-ritual-border bg-[#0a0c0e] flex items-center px-6 shrink-0 z-10">
+                <h1 class="text-gray-300 font-mono text-sm uppercase tracking-widest">System // Configuration & Node Setup</h1>
+            </header>
+            <div class="p-8 flex-1 overflow-y-auto terminal-scroll bg-dots">
+                <div class="max-w-3xl mx-auto space-y-8 pb-32">
+                    
+                    <!-- Setting Block 1 -->
+                    <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg shadow-xl overflow-hidden">
+                        <div class="bg-[#111315] px-6 py-4 border-b border-ritual-border flex items-center gap-3">
+                            <svg class="w-4 h-4 text-ritual-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                            <h3 class="text-white font-mono text-xs uppercase tracking-widest">Ritual Infernet Connectivity</h3>
+                        </div>
+                        <div class="p-6 flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-gray-200 text-sm">Local Node RPC</div>
+                                <div class="text-[10px] text-gray-500 font-mono mt-1 uppercase tracking-wide">Connect to your local Infernet node</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-ritual-green text-[9px] font-mono border border-ritual-green/30 bg-ritual-green/10 px-2 py-0.5 rounded">CONNECTED</span>
+                                <input type="text" value="http://127.0.0.1:4000" class="bg-black border border-gray-800 text-gray-400 px-4 py-2 font-mono text-xs rounded outline-none w-48 text-center" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Setting Block 2 -->
+                    <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg shadow-xl overflow-hidden">
+                        <div class="bg-[#111315] px-6 py-4 border-b border-ritual-border flex items-center gap-3">
+                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            <h3 class="text-white font-mono text-xs uppercase tracking-widest">Ritual Coprocessor Selection</h3>
+                        </div>
+                        <div class="p-6 flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-gray-200 text-sm">Active Engine Ruleset</div>
+                                <div class="text-[10px] text-gray-500 font-mono mt-1 uppercase tracking-wide">Select the Ritual LLM used for security auditing</div>
+                            </div>
+                            <select class="bg-black border border-gray-700 text-gray-200 px-4 py-2 font-mono text-xs rounded outline-none focus:border-ritual-green cursor-pointer">
+                                <option>Static Analyzer (Fast)</option>
+                                <option>Symbolic Execution (Accurate)</option>
+                                <option>Fuzzing Engine (Beta)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Setting Block 3 -->
+                    <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg shadow-xl overflow-hidden">
+                        <div class="bg-[#111315] px-6 py-4 border-b border-ritual-border flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                <h3 class="text-white font-mono text-xs uppercase tracking-widest">Auto-Block Malicious Tx</h3>
+                            </div>
+                            <span class="text-[9px] font-mono text-gray-500 border border-gray-700 px-2 py-0.5 rounded uppercase cursor-pointer hover:bg-gray-800 transition-colors">Upgrade Plan</span>
+                        </div>
+                        <div class="p-6 flex justify-between items-center opacity-50">
+                            <div>
+                                <div class="font-bold text-gray-500 text-sm flex items-center gap-2">
+                                    Hardware Wallet Intercept
+                                    <svg class="w-3 h-3 text-yellow-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div class="text-[10px] text-gray-600 font-mono mt-1 uppercase tracking-wide">Automatically reject transactions to blacklisted addresses</div>
+                            </div>
+                            <!-- Fake Toggle -->
+                            <div class="w-10 h-5 bg-gray-800 rounded-full relative cursor-not-allowed">
+                                <div class="w-4 h-4 bg-gray-600 rounded-full absolute left-0.5 top-0.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Setting Block 4 -->
+                    <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg shadow-xl overflow-hidden">
+                        <div class="bg-[#111315] px-6 py-4 border-b border-ritual-border flex items-center gap-3">
+                            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            <h3 class="text-white font-mono text-xs uppercase tracking-widest">Alerts & Integrations</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <div class="font-bold text-gray-200 text-sm">Discord Webhook</div>
+                                    <div class="text-[10px] text-gray-500 font-mono mt-1 uppercase tracking-wide">Push critical vulnerabilities to your dev team</div>
+                                </div>
+                                <input type="text" placeholder="https://discord.com/api/webhooks/..." class="bg-black border border-gray-800 text-gray-400 px-4 py-2 font-mono text-xs rounded outline-none w-64 focus:border-blue-400 transition-colors">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-gray-200 text-sm">Email Reports</div>
+                                    <div class="text-[10px] text-gray-500 font-mono mt-1 uppercase tracking-wide">Daily summary of scanned contracts</div>
+                                </div>
+                                <!-- Fake Toggle Active -->
+                                <div class="w-10 h-5 bg-blue-500/20 border border-blue-500 rounded-full relative cursor-pointer shadow-[0_0_8px_rgba(59,130,246,0.3)]">
+                                    <div class="w-4 h-4 bg-blue-400 rounded-full absolute right-0.5 top-0.5 shadow-[0_0_5px_blue]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <!-- PAGE: ABOUT -->
+        <div id="page-about" class="page-view flex flex-col h-full w-full absolute inset-0 bg-[#050607] z-0 opacity-0 pointer-events-none transition-opacity duration-300 pb-8">
+            <header class="h-16 border-b border-ritual-border bg-[#0a0c0e] flex items-center px-6 shrink-0 z-10">
+                <h1 class="text-gray-300 font-mono text-sm uppercase tracking-widest">System // About Project</h1>
+            </header>
+            <div class="p-8 flex-1 overflow-y-auto terminal-scroll bg-dots">
+                <div class="max-w-4xl mx-auto space-y-8 pb-32">
+                    <div class="bg-[#0a0c0e] border border-ritual-border rounded-lg shadow-xl overflow-hidden p-8">
+                        <div class="text-ritual-green font-mono font-bold text-3xl glow-green tracking-wider uppercase mb-2">SafeScan</div>
+                        <div class="text-gray-400 font-mono text-sm mb-8">v2.1.0 // Enterprise Blockchain Intelligence</div>
+                        
+                        <div class="text-sm font-mono text-gray-300 space-y-6 leading-relaxed">
+                            <p>
+                                <strong class="text-white text-base">SafeScan</strong> (Powered by Ritual Coprocessor) is an advanced, automated smart contract auditing platform designed to democratize Web3 security. Our mission is to protect retail investors and developers from malicious code, honeypots, and rug pulls.
+                            </p>
+                            
+                            <h3 class="text-white text-lg border-b border-gray-800 pb-2 mt-8 mb-4">Core Capabilities</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong class="text-ritual-green">Static Analysis:</strong> Rapidly scans verified source code for known vulnerabilities and malicious patterns.</li>
+                                <li><strong class="text-ritual-green">Honeypot Detection:</strong> Identifies hidden taxes, transfer restrictions, and blacklist mechanisms.</li>
+                                <li><strong class="text-ritual-green">Privilege Escalation:</strong> Flags unlimited minting functions and excessive owner controls.</li>
+                                <li><strong class="text-ritual-green">Reentrancy Checks:</strong> Protects against the most common vector for draining liquidity pools.</li>
+                            </ul>
+                            
+                            <h3 class="text-white text-lg border-b border-gray-800 pb-2 mt-8 mb-4">How It Works</h3>
+                            <p>
+                                Simply paste a contract address or a link from DEX screener platforms. SafeScan fetches the verified code directly from block explorers (Etherscan, BscScan) and runs it through our proprietary security engine. Within seconds, it translates complex Solidity code into human-readable warnings and assigns a Trust Score.
+                            </p>
+                            
+                            <div class="mt-12 p-4 border border-ritual-green/30 bg-ritual-green/5 rounded text-center">
+                                <span class="text-ritual-green font-bold block mb-1">Built on Ritual Infernet for Hackathon</span>
+                                <span class="text-gray-500 text-xs">Empowering the next generation of safe decentralized finance.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Live Ticker (Fixed absolute at bottom so it overlays pages if needed, or pages have pb-8) -->
+        <footer class="absolute bottom-0 w-full h-8 bg-[#111315] border-t border-ritual-border flex items-center font-mono text-[9px] uppercase tracking-wider text-gray-400 z-50">
+            <div class="px-4 border-r border-ritual-border font-bold text-ritual-green shrink-0 bg-[#0a0c0e] h-full flex items-center shadow-[4px_0_10px_rgba(0,0,0,0.5)] z-10 relative">
+                <div class="w-1.5 h-1.5 bg-ritual-green rounded-full animate-pulse mr-2"></div>
+                LIVE INTEL
+            </div>
+            <div class="flex-1 ticker-wrap h-full flex items-center relative overflow-hidden bg-[#050607]">
+                <div class="animate-marquee whitespace-nowrap absolute flex gap-12">
+                    <span><span class="text-ritual-red font-bold">⚠️ [ETH]</span> Honeypot created by 0x3f...7c</span>
+                    <span><span class="text-ritual-green font-bold">🛡️ [BSC]</span> Safe LP Lock at 0x9a...21</span>
+                    <span><span class="text-gray-400 font-bold">⚙️ [SYS]</span> Security Signatures updated</span>
+                    <span><span class="text-ritual-red font-bold">🚨 [ARB]</span> Infinite mint triggered on 0xbb...ff</span>
+                    <!-- Duplicate for smooth loop -->
+                    <span><span class="text-ritual-red font-bold">⚠️ [ETH]</span> Honeypot created by 0x3f...7c</span>
+                    <span><span class="text-ritual-green font-bold">✓ [BSC]</span> Safe LP Lock at 0x9a...21</span>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

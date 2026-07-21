@@ -1,0 +1,18 @@
+{
+  "name": "ritual-auditor-contracts",
+  "version": "1.0.0",
+  "description": "On-chain smart contracts for Ritual Security Auditor",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js --network ritual"
+  },
+  "dependencies": {
+    "@ritual-net/infernet-sdk": "^1.2.0",
+    "@openzeppelin/contracts": "^5.0.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0"
+  }
+}
