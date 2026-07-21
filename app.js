@@ -153,6 +153,45 @@ contract TheDAO {
         // bypassing this deduction forever!
         balances[msg.sender] -= amount;
     }
+}`,
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": `// [USDC Coin - Fully Audited and Safe]
+contract FiatTokenV2 {
+    string public name = "USD Coin";
+    string public symbol = "USDC";
+    uint8 public decimals = 6;
+    uint256 public totalSupply;
+    mapping(address => uint256) balances;
+
+    // Upgradable proxy architecture proxy implementation
+    address public minter;
+    
+    function transfer(address to, uint256 amount) public returns (bool) {
+        require(balances[msg.sender] >= amount, "ERC20: transfer amount exceeds balance");
+        balances[msg.sender] -= amount;
+        balances[to] += amount;
+        return true;
+    }
+}`,
+    "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000": `// [Fake Token - Minting Scam]
+contract FakeLuna {
+    string public name = "Luna Classic 2.0";
+    string public symbol = "LUNC2";
+    address public owner;
+    mapping(address => uint256) balances;
+
+    constructor() { owner = msg.sender; }
+
+    // CRITICAL VULNERABILITY: Unlimited Minting
+    // Owner can print infinite tokens at will and dump them.
+    function mint(uint256 amount) public {
+        require(msg.sender == owner, "Only owner can mint");
+        balances[owner] += amount;
+    }
+
+    function transfer(address to, uint256 amount) public {
+        balances[msg.sender] -= amount;
+        balances[to] += amount;
+    }
 }`
 };
 
@@ -444,7 +483,7 @@ auditBtn.addEventListener('click', async () => {
     let contractName = "target_contract";
 
     // 1. Check Mock Data Cache first
-    if (MOCK_DATA[address] && !apiKey) {
+    if (MOCK_DATA[address]) {
         await new Promise(r => setTimeout(r, 1200)); 
         source = MOCK_DATA[address];
         if (address === "0x6982508145454ce325ddbe47a25d4ec3d2311933") contractName = "PepeToken";
