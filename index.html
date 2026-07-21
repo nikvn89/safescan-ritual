@@ -77,13 +77,17 @@
             <!-- Logo -->
             <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-ritual-border cursor-pointer bg-gradient-to-r from-black to-[#0a0c0e]" onclick="location.reload()">
                 <div class="hidden md:flex items-center gap-3">
-                    <img src="https://ritual.net/favicon.ico" alt="Ritual" class="w-6 h-6 object-contain rounded bg-white p-0.5 shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                    <div class="w-6 h-6 rounded bg-white p-1 shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center justify-center">
+                        <svg class="w-full h-full text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
                     <div class="text-ritual-green font-mono font-bold text-2xl tracking-widest glow-green">
                         Safe<span class="text-white">Scan</span>
                     </div>
                 </div>
                 <div class="md:hidden flex items-center justify-center">
-                    <img src="https://ritual.net/favicon.ico" alt="Ritual" class="w-8 h-8 object-contain rounded bg-white p-1">
+                    <div class="w-8 h-8 rounded bg-white p-1.5 flex items-center justify-center">
+                        <svg class="w-full h-full text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
                 </div>
             </div>
             
@@ -131,7 +135,7 @@
             <header class="h-16 border-b border-ritual-border bg-gradient-to-r from-ritual-dark to-ritual-black flex items-center justify-between px-6 shrink-0 z-20">
                 <div class="flex items-center gap-4 hidden lg:flex">
                     <div class="w-8 h-8 rounded bg-white flex items-center justify-center p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                        <img src="https://ritual.net/favicon.ico" alt="Ritual Logo" class="w-full h-full object-contain">
+                        <svg class="w-full h-full text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                     </div>
                     <h1 class="text-gray-300 font-mono text-sm tracking-widest uppercase flex items-center gap-2">
                         SYSTEM // <span class="text-white font-bold">POWERED BY RITUAL</span>
@@ -227,38 +231,25 @@
                             </div>
                         </div>
                         
-                        <pre class="m-0 h-full"><code id="code-content" class="language-solidity h-full p-6 text-[13px] font-mono leading-relaxed bg-[#1e2227] text-gray-300 block">// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+                        <pre class="m-0 h-full"><code id="code-content" class="language-solidity h-full p-6 text-[13px] font-mono leading-relaxed bg-[#1e2227] text-ritual-green block" style="text-shadow: 0 0 5px rgba(0,255,65,0.3);">/*
+========================================================================
+  ███████╗ █████╗ ███████╗███████╗███████╗ ██████╗ █████╗ ███╗   ██╗
+  ██╔════╝██╔══██╗██╔════╝██╔════╝██╔════╝██╔════╝██╔══██╗████╗  ██║
+  ███████╗███████║█████╗  █████╗  ███████╗██║     ███████║██╔██╗ ██║
+  ╚════██║██╔══██║██╔══╝  ██╔══╝  ╚════██║██║     ██╔══██║██║╚██╗██║
+  ███████║██║  ██║██║     ███████╗███████║╚██████╗██║  ██║██║ ╚████║
+  ╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝
+========================================================================
+[+] SYSTEM ONLINE     : RITUAL INFERNET COPROCESSOR SECURE LINK ESTABLISHED
+[+] SCAN ENGINE       : V2.1.0 (AI HYBRID HEURISTICS)
+[+] THREAT DB         : SYNCED (14,240 SIGNATURES)
+[+] STATUS            : STANDBY
 
-/**
- * @title TokenVault
- * @dev Simple vault contract for staking tokens
- * WARNING: Target contract loaded for SafeScan Audit
- */
-contract TokenVault {
-    mapping(address => uint256) public balances;
-    address public owner;
+>> WAITING FOR TARGET SMART CONTRACT INPUT...
+>> READY FOR DEEP STATIC & DYNAMIC VULNERABILITY ANALYSIS...
 
-    constructor() {
-        owner = msg.sender;
-    }
-
-    // Deposit ETH into the vault
-    function deposit() public payable {
-        balances[msg.sender] += msg.value;
-    }
-
-    // Withdraw ETH from the vault
-    function withdraw(uint256 _amount) public {
-        require(balances[msg.sender] >= _amount, "Insufficient balance");
-        
-        // Potential Reentrancy Vulnerability detected here
-        (bool success, ) = msg.sender.call{value: _amount}("");
-        require(success, "Transfer failed");
-
-        balances[msg.sender] -= _amount;
-    }
-}</code></pre>
+[!] ENTER CONTRACT ADDRESS ABOVE AND INITIALIZE AUDIT
+*/</code></pre>
                     </div>
                 </section>
 
